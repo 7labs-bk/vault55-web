@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Invited to Vault 55</title>
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="icon.png">
+  <link rel="stylesheet" href="site.css">
+  <style>
+    .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 20px; margin-top: 20px; }
+    .code { font-size: 34px; font-weight: 800; letter-spacing: 1px; color: var(--accent); margin: 4px 0 8px; word-break: break-all; }
+    .gift { color: var(--ok); font-weight: 700; }
+    .actions { display: flex; flex-direction: column; gap: 10px; margin-top: 18px; }
+    .actions a { display: block; text-align: center; text-decoration: none; font-weight: 600; min-height: 44px; padding: 11px 18px; border-radius: 8px; }
+    .primary { background: var(--accent); color: var(--card); border: 1px solid var(--accent); }
+    .secondary { color: var(--accent); border: 1px solid var(--accent); }
+    .small { font-size: 14px; }
+  </style>
+</head>
+<body>
+<main>
+  <nav><a href="terms.html">Terms</a><a href="privacy.html">Privacy</a></nav>
+  <h1>You&#x27;re invited to Vault 55</h1>
+  <p class="muted">Free mini-games. Clear levels, collect Coins and Ingots.</p>
+
+  <div class="card" id="invite">
+    <p class="muted small" id="code-label">Your friend&#x27;s code</p>
+    <p class="code" id="code">&nbsp;</p>
+    <p class="gift" id="gift" hidden>A Coin gift is waiting for you.</p>
+    <p id="how">New players who use this code in their first week get a welcome gift of Coins.</p>
+    <div class="actions">
+      <a class="primary" id="store" href="https://play.google.com/store/apps/details?id=com.sevenlabs.vault55">Get Vault 55 on Google Play</a>
+      <a class="secondary" id="open" href="vault55://invite">I already have the app: open it</a>
+    </div>
+  </div>
+
+  <p class="muted small" style="margin-top:18px">The friend who sent this gets a bonus when you play.</p>
+  <p class="muted small">Coins are for playing in the app. Rewards need verified play; installing alone earns nothing. For players 18 and older in the United States.</p>
+</main>
+<script>
+  // Reads ?c=CODE&g=TOKEN. Anything that does not match the patterns the app uses is ignored.
+  (function () {
+    var q = new URLSearchParams(location.search);
+    var code = (q.get("c") || "").trim().toUpperCase();
+    var gift = (q.get("g") || "").trim().toUpperCase();
+    if (!/^[A-Z]{3,8}-[0-9]{2,3}$/.test(code)) code = "";
+    if (!/^[A-Z2-9]{8}$/.test(gift)) gift = "";
+
+    var params = new URLSearchParams();
+    if (code) params.set("c", code);
+    if (gift) params.set("g", gift);
+    var query = params.toString();
+
+    if (code) {
+      document.getElementById("code").textContent = code;
+    } else {
+      document.getElementById("code-label").hidden = true;
+      document.getElementById("code").hidden = true;
+      document.getElementById("how").textContent = "Ask your friend for their code: it gives new players a welcome gift of Coins.";
+    }
+    if (gift) document.getElementById("gift").hidden = false;
+
+    // The Play Store keeps the referrer through the install, so the app can find the code.
+    var store = "https://play.google.com/store/apps/details?id=com.sevenlabs.vault55";
+    if (query) store += "&referrer=" + encodeURIComponent(query);
+    document.getElementById("store").href = store;
+
+    var app = "vault55://invite" + (query ? "?" + query : "");
+    document.getElementById("open").href = app;
+    // Try the app once; if it is not installed the page simply stays.
+    if (query && /Android/i.test(navigator.userAgent)) {
+      setTimeout(function () { location.href = app; }, 300);
+    }
+  })();
+</script>
+</body>
+</html>
